@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 from torch.utils.data import Dataset
@@ -33,7 +32,7 @@ class LabeledDataset(Dataset):
     def __getitem__(self, idx):
         image = np.array(Image.open(self.image_paths[idx]).convert("RGB"))
         mask = np.array(Image.open(self.mask_paths[idx]).convert("L"))
-        mask = (mask > 0).astype(np.float32)
+        mask = (mask > 0).astype(np.float32)  # Convert to binary
 
         transformed = self.transform(image=image, mask=mask)
         return transformed["image"], transformed["mask"]
