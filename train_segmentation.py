@@ -24,15 +24,24 @@ transform = A.Compose([
 ])
 
 # تحميل البيانات
-train_dataset = LabeledDataset(os.path.join(DATA_DIR, "train/images"),
-                               os.path.join(DATA_DIR, "train/masks"),
-                               transform=transform)
-val_dataset = LabeledDataset(os.path.join(DATA_DIR, "val/images"),
-                             os.path.join(DATA_DIR, "val/masks"),
-                             transform=transform)
+# إعداد المسارات الكاملة للصور والماسكات
+def get_file_paths(img_dir, mask_dir):
+    image_paths = [os.path.join(img_dir, f) for f in os.listdir(img_dir) if not os.path.isdir(os.path.join(img_dir, f))]
+    mask_paths = [os.path.join(mask_dir, f) for f in os.listdir(mask_dir) if not os.path.isdir(os.path.join(mask_dir, f))]
+    return image_paths, mask_paths
 
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
+train_img_dir = os.path.join(DATA_DIR, "train/images")
+train_mask_dir = os.path.join(DATA_DIR, "train/masks")
+val_img_dir = os.path.join(DATA_DIR, "val/images")
+val_mask_dir = os.path.join(DATA_DIR, "val/masks")
+
+train_image_paths, train_mask_paths = get_file_paths(train_img_dir, train_mask_dir)
+val_image_paths, val_mask_paths = get_file_paths(val_img_dir, val_mask_dir)
+
+train_dataset = LabeledDataset(train_image_paths, train_mask_paths, transform=transform)
+val_dataset = LabeledDataset(val_image_paths, val_mask_paths, transform=transform)
+
+
 
 # النموذج
 model = smp.Unet(encoder_name="resnet34", encoder_weights="imagenet", in_channels=3, classes=1)
